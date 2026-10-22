@@ -94,6 +94,14 @@ function VoicePicker(props: { value: string; onChange: (uri: string) => void }) 
   );
 }
 
+function buildDate(): string {
+  const raw = typeof __BUILD_DATE__ === 'string' ? __BUILD_DATE__ : '';
+  const d = new Date(raw);
+  return Number.isNaN(d.getTime())
+    ? 'неизвестно'
+    : d.toLocaleString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+}
+
 function backupName(): string {
   const d = new Date();
   const pad = (n: number) => String(n).padStart(2, '0');
@@ -282,6 +290,7 @@ export function Parents(props: ParentsProps) {
           Приложение не собирает личные данные, не показывает рекламу и работает без интернета. Имена детей
           хранятся только в браузере этого устройства.
         </p>
+        <p className="muted">Версия от {buildDate()}</p>
       </section>
     </div>
   );
