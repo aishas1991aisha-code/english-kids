@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#2F5BD3"/>
+  <g stroke="#ffffff" stroke-opacity="0.35" stroke-width="6">
+    <line x1="0" x2="512" y1="176" y2="176"/>
+    <line x1="0" x2="512" y1="222" y2="222" stroke-opacity="0.2"/>
+    <line x1="0" x2="512" y1="330" y2="330" stroke-opacity="0.75"/>
+    <line x1="0" x2="512" y1="380" y2="380"/>
+  </g>
+  <line x1="108" x2="108" y1="0" y2="512" stroke="#FF6B74" stroke-width="10"/>
+  <text x="140" y="330" font-family="DejaVu Sans, Arial, sans-serif" font-weight="700" font-size="230" fill="#ffffff">Ab</text>
+</svg>
