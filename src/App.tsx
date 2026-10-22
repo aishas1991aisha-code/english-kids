@@ -9,8 +9,9 @@ import { Training } from './screens/Training';
 import { Dictation } from './screens/Dictation';
 import { ProgressScreen } from './screens/ProgressScreen';
 import { Parents } from './screens/Parents';
+import { Dictionary } from './screens/Dictionary';
 import { Notice } from './components/ui';
-import { warmUpSpeech } from './lib/speech';
+import { setPreferredVoice, warmUpSpeech } from './lib/speech';
 
 const SESSION_SIZE = 10;
 
@@ -19,6 +20,7 @@ type Screen =
   | { name: 'parents' }
   | { name: 'menu' }
   | { name: 'progress' }
+  | { name: 'dictionary' }
   | { name: 'train'; choice: StartChoice; words: Word[]; run: number };
 
 /** Куда ведёт кнопка «Назад» (и системная кнопка «Назад» на Android). */
@@ -51,6 +53,8 @@ export default function App() {
   useEffect(() => {
     warmUpSpeech();
   }, []);
+
+  setPreferredVoice(data.settings.voice);
 
   // История браузера: системная кнопка «Назад» поднимается на уровень выше, а не закрывает приложение.
   useEffect(() => {
@@ -106,6 +110,10 @@ export default function App() {
           onReset={(id) => update((d) => resetProgress(d, id))}
           onImport={(imported) => update(() => imported)}
           onAutoSpeak={(autoSpeak) => update((d) => ({ ...d, settings: { ...d.settings, autoSpeak } }))}
+          onVoice={(voice) => {
+            setPreferredVoice(voice);
+            update((d) => ({ ...d, settings: { ...d.settings, voice } }));
+          }}
           onBack={goBack}
         />
       );
@@ -117,9 +125,13 @@ export default function App() {
           onSelect={(grade: Grade, topicId: string) => update((d) => patchProfile(d, profileId, { grade, topicId }))}
           onStart={(choice) => goDeeper(buildRun(choice, Date.now()))}
           onProgress={() => goDeeper({ name: 'progress' })}
+          onDictionary={() => goDeeper({ name: 'dictionary' })}
           onBack={goBack}
         />
       );
+      break;
+    case 'dictionary':
+      content = <Dictionary profile={profile} onBack={goBack} />;
       break;
     case 'progress':
       content = <ProgressScreen profile={profile} onBack={goBack} />;

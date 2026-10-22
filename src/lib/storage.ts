@@ -38,6 +38,8 @@ export interface Profile {
 export interface Settings {
   /** Произносить слово после ответа автоматически. */
   autoSpeak: boolean;
+  /** voiceURI выбранного голоса; пустая строка — автоматически. */
+  voice: string;
 }
 
 export interface AppData {
@@ -74,7 +76,7 @@ export function defaultData(): AppData {
   return {
     version: 1,
     profiles: { kid1: defaultProfile('kid1'), kid2: defaultProfile('kid2') },
-    settings: { autoSpeak: true },
+    settings: { autoSpeak: true, voice: '' },
   };
 }
 
@@ -152,6 +154,7 @@ export function sanitizeData(raw: unknown): AppData | null {
     },
     settings: {
       autoSpeak: isObj(raw.settings) && typeof raw.settings.autoSpeak === 'boolean' ? raw.settings.autoSpeak : true,
+      voice: isObj(raw.settings) && typeof raw.settings.voice === 'string' ? raw.settings.voice.slice(0, 300) : '',
     },
   };
 }

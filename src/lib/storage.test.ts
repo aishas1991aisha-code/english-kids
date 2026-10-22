@@ -47,10 +47,12 @@ describe('сохранение', () => {
   });
   it('настройки озвучки сохраняются, старые данные без настроек получают значение по умолчанию', () => {
     const s = memoryStorage();
-    saveData(s, { ...defaultData(), settings: { autoSpeak: false } });
+    saveData(s, { ...defaultData(), settings: { autoSpeak: false, voice: 'x' } });
     expect(loadData(s).data.settings.autoSpeak).toBe(false);
+    expect(loadData(s).data.settings.voice).toBe('x');
     const old = memoryStorage({ [STORAGE_KEY]: JSON.stringify({ version: 1, profiles: {} }) });
     expect(loadData(old).data.settings.autoSpeak).toBe(true);
+    expect(loadData(old).data.settings.voice).toBe('');
   });
   it('если хранилище недоступно — работает без падения', () => {
     const broken: KVStorage = {

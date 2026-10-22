@@ -4,7 +4,7 @@ import { checkGaps, checkWritten, makeGaps, normalize } from './check';
 import { pickVoice } from './speech';
 
 const word = (en: string, alt: string[] = [], capital = false): Word => ({
-  id: `t-${en}`, ru: 'тест', en, alt, grade: 2, topicId: 't', emoji: '', capital,
+  id: `t-${en}`, ru: 'тест', en, alt, grade: 2, topicId: 't', emoji: '', ipa: '', capital,
 });
 
 /** Детерминированный генератор для тестов. */
@@ -65,6 +65,15 @@ describe('checkWritten — «Напиши слово»', () => {
     expect(checkWritten(monday, 'monday')).toEqual({ status: 'correct', capitalHint: true });
     expect(checkWritten(monday, 'Monday')).toEqual({ status: 'correct' });
   });
+  it('принимает современные и американские варианты из словаря', () => {
+    const find = (en: string) => WORDS.find((w) => w.en === en)!;
+    expect(checkWritten(find('father'), 'dad').status).toBe('correct');
+    expect(checkWritten(find('father'), 'Daddy').status).toBe('correct');
+    expect(checkWritten(find('mum'), 'mom').status).toBe('correct');
+    expect(checkWritten(find('trousers'), 'pants').status).toBe('correct');
+    expect(checkWritten(find('table tennis'), 'ping-pong').status).toBe('correct');
+    expect(checkWritten(find('father'), 'mother').status).toBe('wrong');
+  });
   it('каждое слово словаря принимает своё основное написание и альтернативы', () => {
     for (const w of WORDS) {
       expect(checkWritten(w, w.en).status).toBe('correct');
@@ -122,13 +131,27 @@ describe('makeGaps / checkGaps — «Вставь буквы»', () => {
 });
 
 describe('выбор голоса для озвучки', () => {
-  const v = (lang: string, localService = true) => ({ lang, localService, name: lang }) as SpeechSynthesisVoice;
+  const v = (lang: string, localService = true, name = lang) =>
+    ({ lang, localService, name, voiceURI: name }) as SpeechSynthesisVoice;
   it('предпочитает британский, затем американский голос', () => {
     expect(pickVoice([v('ru-RU'), v('en-US'), v('en-GB')])?.lang).toBe('en-GB');
     expect(pickVoice([v('ru-RU'), v('en-US'), v('en-AU')])?.lang).toBe('en-US');
   });
   it('локальный голос важнее сетевого того же языка', () => {
     expect(pickVoice([v('en-GB', false), v('en-GB', true)])?.localService).toBe(true);
+  });
+  it('естественные голоса важнее стандартных голосов Windows', () => {
+    const hazel = v('en-GB', true, 'Microsoft Hazel - English (United Kingdom)');
+    const sonia = v('en-GB', false, 'Microsoft Sonia Online (Natural) - English (United Kingdom)');
+    const google = v('en-GB', false, 'Google UK English Female');
+    expect(pickVoice([hazel, google, sonia])?.name).toBe(sonia.name);
+    expect(pickVoice([hazel, google])?.name).toBe(google.name);
+  });
+  it('голос из настроек имеет приоритет, если он есть на устройстве', () => {
+    const hazel = v('en-GB', true, 'Microsoft Hazel');
+    const sonia = v('en-GB', false, 'Microsoft Sonia Online (Natural)');
+    expect(pickVoice([hazel, sonia], 'Microsoft Hazel')?.name).toBe('Microsoft Hazel');
+    expect(pickVoice([hazel, sonia], 'нет такого')?.name).toBe(sonia.name);
   });
   it('без английских голосов возвращает null', () => {
     expect(pickVoice([v('ru-RU'), v('de-DE')])).toBe(null);

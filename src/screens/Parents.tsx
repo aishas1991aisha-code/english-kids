@@ -1,10 +1,10 @@
-import { useState, type ChangeEvent } from 'react';
+import { useEffect, useState, type ChangeEvent } from 'react';
 import { WORDS } from '../data/words';
 import {
   AVATARS, COLORS, PROFILE_IDS, exportJson, importJson, type AppData, type Profile, type ProfileId,
 } from '../lib/storage';
 import { Notice, TopBar } from '../components/ui';
-import { speak, speechSupported } from '../lib/speech';
+import { availableEnglishVoices, onVoicesChanged, speak, speechSupported } from '../lib/speech';
 
 type Patch = Partial<Pick<Profile, 'name' | 'avatar' | 'color'>>;
 
@@ -14,6 +14,7 @@ export interface ParentsProps {
   onReset: (id: ProfileId) => void;
   onImport: (data: AppData) => void;
   onAutoSpeak: (on: boolean) => void;
+  onVoice: (voiceURI: string) => void;
   onBack: () => void;
 }
 
@@ -52,6 +53,43 @@ function Gate(props: { onPass: () => void; onBack: () => void }) {
           Открыть
         </button>
       </form>
+    </div>
+  );
+}
+
+/** Выбор голоса озвучки из установленных на устройстве. */
+function VoicePicker(props: { value: string; onChange: (uri: string) => void }) {
+  const [voices, setVoices] = useState(() => availableEnglishVoices());
+  useEffect(() => onVoicesChanged(() => setVoices(availableEnglishVoices())), []);
+  const missing = props.value !== '' && !voices.some((v) => v.voiceURI === props.value);
+
+  return (
+    <div className="voice-picker">
+      <label className="label" htmlFor="voice">
+        Голос
+      </label>
+      <select
+        id="voice"
+        className="field"
+        value={missing ? '' : props.value}
+        onChange={(e) => {
+          props.onChange(e.target.value);
+          setTimeout(() => speak('Hello! My name is English Kids.'), 50);
+        }}
+      >
+        <option value="">Автоматически (лучший)</option>
+        {voices.map((v) => (
+          <option key={v.voiceURI} value={v.voiceURI}>
+            {v.name.replace(/^Microsoft /, '').replace(/ - English.*$/, '')} ({v.lang}){v.localService ? '' : ', интернет'}
+          </option>
+        ))}
+      </select>
+      <p className="muted">
+        На Windows лучше всего звучат голоса с пометкой <b>Natural</b> — они есть в браузере Microsoft Edge и работают
+        при подключённом интернете. В Chrome выберите <b>Google UK English</b>. Голоса Microsoft David, Zira и Hazel
+        звучат роботизированно. Без интернета приложение само переключится на голос устройства.
+      </p>
+      {voices.length === 0 && <p className="muted">Список голосов загружается…</p>}
     </div>
   );
 }
@@ -193,7 +231,8 @@ export function Parents(props: ParentsProps) {
               Кнопка с динамиком есть всегда: в «Вставь буквы», после проверки, в результатах и в прогрессе. В «Напиши
               слово» и в диктанте звук до ответа не включается, чтобы не подсказывать.
             </p>
-            <button type="button" className="btn small" onClick={() => speak('Hello! Let’s learn English.')}>
+            <VoicePicker value={props.data.settings.voice} onChange={props.onVoice} />
+            <button type="button" className="btn small" onClick={() => speak('Hello! Let’s learn English. Elephant, giraffe, February.')}>
               Проверить звук
             </button>
             <p className="muted">
@@ -235,8 +274,9 @@ export function Parents(props: ParentsProps) {
       <section className="panel">
         <h2>О приложении</h2>
         <p className="muted">
-          В словаре {WORDS.length} слов по темам 2, 3 и начала 4 класса. Подбор ориентирован на уровень учебников
-          «Enjoy English» (М. З. Биболетова), но это не полная и не официальная копия учебника.
+          В словаре {WORDS.length} слов. Они сверены со словарями учебников «Enjoy English» (М. З. Биболетова) для 2, 3
+          и 4 класса: каждое слово стоит в том классе, где появляется в учебнике. Это учебная выборка, а не
+          официальная копия учебника.
         </p>
         <p className="muted">
           Приложение не собирает личные данные, не показывает рекламу и работает без интернета. Имена детей

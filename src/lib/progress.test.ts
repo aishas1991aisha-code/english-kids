@@ -5,7 +5,7 @@ import {
 } from './progress';
 import { defaultData, type WordStat } from './storage';
 
-const W = (id: string): Word => ({ id, ru: id, en: id, alt: [], grade: 2, topicId: 't', emoji: '', capital: false });
+const W = (id: string): Word => ({ id, ru: id, en: id, alt: [], grade: 2, topicId: 't', emoji: '', ipa: '', capital: false });
 
 describe('изоляция профилей', () => {
   it('ответ одного ребёнка не меняет данные другого', () => {
@@ -96,6 +96,19 @@ describe('словарь', () => {
     for (const w of WORDS) {
       for (const s of [w.en, ...w.alt]) expect(s).toMatch(/^[A-Za-z]+([ -][A-Za-z]+)*$/);
       expect(w.ru).toMatch(/[а-яё]/i);
+    }
+  });
+  it('у каждого слова есть транскрипция без русских букв', () => {
+    for (const w of WORDS) {
+      expect(w.ipa.length).toBeGreaterThan(0);
+      expect(/[а-яё]/i.test(w.ipa)).toBe(false);
+    }
+  });
+  it('одно русское задание не ведёт к двум разным словам', () => {
+    const seen = new Map<string, string>();
+    for (const w of WORDS) {
+      expect(seen.get(w.ru) === undefined || seen.get(w.ru) === w.en).toBe(true);
+      seen.set(w.ru, w.en);
     }
   });
   it('в каждом классе есть слова', () => {

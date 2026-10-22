@@ -423,6 +423,109 @@ h2 {
   accent-color: var(--pen);
 }
 
+/* ───────── Словарь ───────── */
+
+.ipa {
+  font-family: 'Charis SIL', 'Doulos SIL', 'Gentium Plus', 'Lucida Sans Unicode', 'Arial Unicode MS', 'Segoe UI', sans-serif;
+  color: var(--ink-2);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.variants {
+  font-size: 0.9rem;
+  color: var(--ink-2);
+}
+
+.feedback .ipa,
+.feedback .variants {
+  font-size: 0.95rem;
+}
+
+.dict {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dict-row {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--sheet);
+  border: 2px solid var(--rule-soft);
+}
+
+.dict-emoji {
+  font-size: 28px;
+  line-height: 1;
+  text-align: center;
+  font-weight: 800;
+  color: var(--kid);
+}
+
+.dict-main {
+  min-width: 0;
+}
+
+.dict-en {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+
+.dict-en b {
+  font-size: 1.2rem;
+  color: var(--pen);
+}
+
+.dict-ru {
+  font-weight: 600;
+}
+
+.badge {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 1px 8px;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.badge.learned {
+  background: var(--leaf-bg);
+  color: var(--leaf);
+}
+
+.badge.trouble {
+  background: var(--bad-bg);
+  color: var(--margin);
+}
+
+select.field {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--ink-2) 50%),
+    linear-gradient(135deg, var(--ink-2) 50%, transparent 50%);
+  background-position: calc(100% - 22px) 50%, calc(100% - 16px) 50%;
+  background-size: 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 40px;
+  font-size: 1rem;
+}
+
+.voice-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 /* ───────── Задание ───────── */
 
 .task {

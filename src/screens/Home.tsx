@@ -52,6 +52,7 @@ export function Menu(props: {
   onSelect: (grade: Grade, topicId: string) => void;
   onStart: (choice: StartChoice) => void;
   onProgress: () => void;
+  onDictionary: () => void;
   onBack: () => void;
 }) {
   const { profile } = props;
@@ -162,9 +163,14 @@ export function Menu(props: {
         )}
       </div>
 
-      <button type="button" className="btn ghost" onClick={props.onProgress}>
-        Мой прогресс
-      </button>
+      <div className="row">
+        <button type="button" className="btn" onClick={props.onDictionary}>
+          <span aria-hidden="true">📖</span>&nbsp;Словарь
+        </button>
+        <button type="button" className="btn" onClick={props.onProgress}>
+          <span aria-hidden="true">📊</span>&nbsp;Мой прогресс
+        </button>
+      </div>
     </div>
   );
 }

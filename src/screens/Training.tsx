@@ -1,6 +1,6 @@
 import { useRef, useState, type FormEvent } from 'react';
 import type { Word } from '../data/words';
-import { checkGaps, checkWritten, makeGaps, type GapPuzzle } from '../lib/check';
+import { checkGaps, checkWritten, makeGaps, normalize, type GapPuzzle } from '../lib/check';
 import { newSessionId } from '../lib/progress';
 import type { Mode, SessionRecord } from '../lib/storage';
 import { Answer, GapField, Prompt, WriteField } from '../components/Copybook';
@@ -234,6 +234,8 @@ export function Training(props: TrainingProps) {
                 Правильно: <Answer text={item.word.en} highlight={props.input === 'gaps' ? puzzle.hidden : undefined} />
               </span>
             )}
+            {item.word.ipa && <span className="ipa">[{item.word.ipa}]</span>}
+            {props.input === 'write' && <Variants word={item.word} given={text} />}
           </div>
         )}
 
@@ -243,4 +245,13 @@ export function Training(props: TrainingProps) {
       </form>
     </div>
   );
+}
+
+/** Другие допустимые варианты: «Тоже верно: dad, daddy». */
+function Variants(props: { word: Word; given: string }) {
+  const all = [props.word.en, ...props.word.alt];
+  const given = normalize(props.given);
+  const others = all.filter((v) => normalize(v) !== given);
+  if (props.word.alt.length === 0 || others.length === 0) return null;
+  return <span className="variants">Тоже верно: {others.join(', ')}</span>;
 }
